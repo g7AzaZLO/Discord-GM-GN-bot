@@ -1,15 +1,19 @@
 import threading as th
 from cConnection import Connection
 import os
+import colorama
+from colorama import Fore, Style, init
 
-print("""
+init()
+
+print(Fore.CYAN + """
 ░█████╗░██╗░░░██╗████████╗░█████╗░░██████╗░███╗░░░███╗
 ██╔══██╗██║░░░██║╚══██╔══╝██╔══██╗██╔════╝░████╗░████║
 ███████║██║░░░██║░░░██║░░░██║░░██║██║░░██╗░██╔████╔██║
 ██╔══██║██║░░░██║░░░██║░░░██║░░██║██║░░╚██╗██║╚██╔╝██║
 ██║░░██║╚██████╔╝░░░██║░░░╚█████╔╝╚██████╔╝██║░╚═╝░██║ By
-╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░░╚═════╝░╚═╝░░░░░╚═╝   AzaZlo""")
-
+╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░░╚═════╝░╚═╝░░░░░╚═╝   [G7]AzaZlo""")
+print(Style.RESET_ALL)
 all_threads = {}
 
 
@@ -30,13 +34,15 @@ def new_thread():
     timer = input("[X] Введите переодичность отправки в секундах\n >> ")
     name = input("[X] Введите уникальное название процесса\n >> ")
     if name in all_thread_names:
-        print('ERROR: Такой процесс  уже существует, введите другое название')
+        print(Fore.RED + '\nERROR: Такой процесс  уже существует, введите другое название')
+        print(Style.RESET_ALL)
     else:
         new_con = Connection(token, channelid, message, timer, name)
         new_con.send_message()
         all_threads[new_con.name] = new_con
         all_thread_names.append(new_con.name)
-        print('Процесс запущен!\n')
+        print(Fore.GREEN + 'Процесс запущен!\n')
+        print(Style.RESET_ALL)
 
 
 def table_thread():
@@ -57,13 +63,15 @@ def table_thread():
             channelid = line_channel
             name = f'{token}_{channelid}'
             if name in all_thread_names:
-                print('ERROR: Такой процесс  уже существует')
+                print(Fore.RED + '\nERROR: Такой процесс  уже существует')
+                print(Style.RESET_ALL)
             else:
                 new_con = Connection(token, channelid, message, timer, name)
                 new_con.send_message()
                 all_threads[new_con.name] = new_con
                 all_thread_names.append(new_con.name)
-                print('Процесс запущен!\n')
+                print(Fore.GREEN + 'Процесс запущен!\n')
+                print(Style.RESET_ALL)
 
 
 def main():
@@ -85,20 +93,23 @@ def main():
                 all_thread_names.remove(name_thread)
                 print('Удален из списка имен')
             except KeyError:
-                print('ERROR: такого процесса не существует')
+                print(Fore.RED + '\nERROR: такого процесса не существует')
+                print(Style.RESET_ALL)
 
         elif switch == '3':
             print("Введите название процесса:\n")
             name_thread = input(' >> ')
             try:
-                print("Логи процесса " + name_thread + "\n---------------------")
+                print(Fore.YELLOW + "Логи процесса " + name_thread + "\n---------------------")
                 buffer = all_threads[name_thread]
                 logs = buffer.get_log()
                 for i in logs:
                     print(i)
                 print('---------------------')
+                print(Style.RESET_ALL)
             except KeyError:
-                print('ERROR: такого процесса не существует')
+                print(Fore.RED + '\nERROR: такого процесса не существует')
+                print(Style.RESET_ALL)
         elif switch == '4':
             print('Все процессы:\n---------------------')
             get_all_threads_key()
@@ -113,11 +124,13 @@ def main():
                 print('Запуск')
                 table_thread()
             else:
-                print('Команды не существует, проверьте не опечатались ли вы')
+                print(Fore.RED + '\nERROR: Команды не существует, проверьте не опечатались ли вы')
+                print(Style.RESET_ALL)
         elif switch == 'q':
             os.abort()
         else:
-            print('\nУказан неверный номер действия\n')
+            print(Fore.RED + '\nERROR: Указан неверный номер действия\n')
+            print(Style.RESET_ALL)
 
 
 main()
