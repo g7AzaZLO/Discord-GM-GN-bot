@@ -1,11 +1,15 @@
+# -*- coding: utf-8 -*-
+
 import requests as req
 from datetime import datetime
 from websocket import create_connection
 from threading import Timer
+import random
 
+buffer_list_message = []
 
 class Connection:
-    def __init__(self, token, channelid, message, timer, name):
+    def __init__(self, token, channelid, message, timer, name, random=0):
         self.token = token
         self.channelid = channelid
         self.message = message
@@ -13,6 +17,7 @@ class Connection:
         self.log = []
         self.name = name
         self.thread = None
+        self.random = random
 
     def get_name(self):
         return self.name
@@ -31,6 +36,27 @@ class Connection:
 
     def get_log(self):
         return self.log
+
+    def get_random_message(self):
+        file_message = open('message.txt', 'r', encoding='utf-8')
+        list_message = []
+        for line in file_message:
+            list_message.append(line.strip())
+        return (random.choice(list_message))
+
+    def get_smart_random_message(self):
+        global buffer_list_message
+        file_message = open('message.txt', 'r', encoding='utf-8')
+        list_message = []
+        for line in file_message:
+            list_message.append(line.strip())
+        while True:
+            if list(set(list_message) - set(buffer_list_message)) == []:
+                buffer_list_message = []
+            un_message = random.choice(list_message)
+            if un_message not in buffer_list_message:
+                buffer_list_message.append(un_message)
+                return un_message
 
     def set_token(self, new_token):
         self.token = new_token
@@ -63,11 +89,14 @@ class Connection:
     def send_message(self):
         token = self.token
         channelid = self.channelid
-        message = self.message
+        if self.random == 1:
+            message = self.get_random_message()
+        elif self.random == 2:
+            message = self.get_smart_random_message()
+        else:
+            message = self.message
         timer = int(self.timer)
-
         s = req.session()
-        message = message
         s.headers.update({'authorization': token, 'Content-Type': 'application/json'})
         payload = {"content": message, "tts": False}
         ws = create_connection("wss://gateway.discord.gg/")

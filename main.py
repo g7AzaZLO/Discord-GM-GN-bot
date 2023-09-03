@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import threading as th
 from cConnection import Connection
 import os
 import colorama
 from colorama import Fore, Style, init
+import random
 
 init()
 
@@ -47,11 +50,11 @@ def new_thread():
 
 def table_thread():
     global all_thread_names
-    file_token = open('token.txt', 'r')
+    file_token = open('token.txt', 'r', encoding='utf-8')
     list_token = []
     for line in file_token:
         list_token.append(line.strip())
-    file_channel = open('channel.txt', 'r')
+    file_channel = open('channel.txt', 'r', encoding='utf-8')
     list_channel = []
     for line in file_channel:
         list_channel.append(line.strip())
@@ -74,11 +77,52 @@ def table_thread():
                 print(Style.RESET_ALL)
 
 
+def random_message(choise):
+    global all_thread_names
+    if choise == 1:
+        token = input("[X] Вставьте токен юзера от которого будет производится отправка\n >> ")
+        channelid = input(
+            "[X] Вставьте id канала в который будут отправляться сообщения (пользователь должен находиться на сервере)\n >> ")
+        timer = input("[X] Введите переодичность отправки в секундах\n >> ")
+        name = input("[X] Введите уникальное название процесса\n >> ")
+        if name in all_thread_names:
+            print(Fore.RED + '\nERROR: Такой процесс  уже существует, введите другое название')
+            print(Style.RESET_ALL)
+        else:
+            message = None
+            new_con = Connection(token, channelid, message, timer, name, random=1)
+            new_con.send_message()
+            all_threads[new_con.name] = new_con
+            all_thread_names.append(new_con.name)
+            print(Fore.GREEN + 'Процесс запущен!\n')
+            print(Style.RESET_ALL)
+    elif choise == 2:
+        token = input("[X] Вставьте токен юзера от которого будет производится отправка\n >> ")
+        channelid = input(
+            "[X] Вставьте id канала в который будут отправляться сообщения (пользователь должен находиться на сервере)\n >> ")
+        timer = input("[X] Введите переодичность отправки в секундах\n >> ")
+        name = input("[X] Введите уникальное название процесса\n >> ")
+        if name in all_thread_names:
+            print(Fore.RED + '\nERROR: Такой процесс  уже существует, введите другое название')
+            print(Style.RESET_ALL)
+        else:
+            message = None
+            new_con = Connection(token, channelid, message, timer, name, random=2)
+            new_con.send_message()
+            all_threads[new_con.name] = new_con
+            all_thread_names.append(new_con.name)
+            print(Fore.GREEN + 'Процесс запущен!\n')
+            print(Style.RESET_ALL)
+    else:
+        print(Fore.RED + 'ERROR: такого варианта')
+        print(Style.RESET_ALL)
+
+
 def main():
     global all_thread_names
     while True:
         print(
-            '1) Создать новый процесс\n2) Удалить процесс\n3) Просмотреть лог процесса\n4) Список процессов\n5) База токенов х база каналов х время\nq) Выход\n')
+            '1) Создать новый процесс\n2) Удалить процесс\n3) Просмотреть лог процесса\n4) Список процессов\n5) База токенов х база каналов х время\n6) Отправка рандом сообщения из файла\nq) Выход\n')
         switch = input(' >> ')
         if switch == '1':
             new_thread()
@@ -123,6 +167,26 @@ def main():
             if x == 'start':
                 print('Запуск')
                 table_thread()
+            else:
+                print(Fore.RED + '\nERROR: Команды не существует, проверьте не опечатались ли вы')
+                print(Style.RESET_ALL)
+        elif switch == '6':
+            print('Режим отправки рандомных сообщений')
+            print('Список сообщений, которые будут выбираться на угад запишите в файл message.txt')
+            print('Кажое новое сообщение на новой строке')
+            print(Fore.YELLOW + 'WARNING: если слишком часто писать сообщения, то вас могут забанить как бота')
+            print(Style.RESET_ALL)
+            print('')
+            print('1) Использовать обычный рандом')
+            print(
+                '2) Использовать умный рандом(Ни один аккаунт не повторит фразу с другим, пока не кончатся все сообщения в файле)')
+            x = input("\n >> ")
+            if x == '1':
+                print('Запуск')
+                random_message(choise=1)
+            elif x == '2':
+                print('Запуск')
+                random_message(choise=2)
             else:
                 print(Fore.RED + '\nERROR: Команды не существует, проверьте не опечатались ли вы')
                 print(Style.RESET_ALL)
